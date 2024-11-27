@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deploy via Render</title>
+  <style>
+    /* General Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(120deg, #6a11cb, #2575fc);
+      color: #ffffff;
+      text-align: center;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      animation: fadeIn 2s ease-in-out;
+    }
+
+    p {
+      font-size: 1.2rem;
+      margin-bottom: 20px;
+      animation: fadeIn 2.5s ease-in-out;
+    }
+
+    input {
+      padding: 15px;
+      font-size: 1rem;
+      border: 2px solid #ffffff;
+      border-radius: 8px;
+      outline: none;
+      margin-top: 10px;
+      margin-bottom: 20px;
+      width: 80%;
+      max-width: 400px;
+      transition: border-color 0.3s ease-in-out;
+    }
+
+    input:focus {
+      border-color: #45a049;
+    }
+
+    button {
+      padding: 15px 25px;
+      font-size: 1rem;
+      background-color: #4CAF50;
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+      transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out;
+    }
+
+    button:hover {
+      background-color: #45a049;
+      transform: scale(1.05);
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    .message {
+      font-size: 1.2rem;
+      margin-top: 20px;
+      font-weight: bold;
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    .error {
+      color: #ff6961;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Deploy Rias Gremory V3 On Render</h1>
+  <p>Enter your GitHub username to check if you have forked the repository:</p>
+  <input
+    type="text"
+    id="githubUsername"
+    placeholder="Enter GitHub username"
+  />
+  <button onclick="checkFork()">Check Fork</button>
+  <p id="message" class="message"></p>
+
+  <script>
+    const repoOwner = "Toxic1239"; // Replace with the repository owner's username
+    const repoName = "Queen-RiasV3"; // Replace with the repository name
+
+    async function checkFork() {
+      const username = document.getElementById("githubUsername").value.trim();
+      const messageElement = document.getElementById("message");
+
+      if (!username) {
+        messageElement.textContent = "Please enter your GitHub username.";
+        messageElement.classList.add("error");
+        return;
+      }
+
+      messageElement.textContent = "Checking if you have forked the repository...";
+      messageElement.classList.remove("error");
+
+      try {
+        // Fetch repository details
+        const response = await fetch(
+          `https://api.github.com/repos/${username}/${repoName}`
+        );
+
+        if (response.ok) {
+          // User has forked the repository
+          messageElement.textContent =
+            "You have forked the repository! Redirecting to Render...";
+          messageElement.classList.remove("error");
+
+          // Redirect to Render after 2 seconds
+          setTimeout(() => {
+            window.location.href = `https://render.com/deploy?repo=https://github.com/Hiddennigi/RIAA-V3-RENDER`;
+          }, 2000);
+        } else if (response.status === 404) {
+          // User has not forked the repository
+          messageElement.textContent =
+            "You have not forked the repository. Redirecting to fork now...";
+          messageElement.classList.add("error");
+
+          // Open the fork page after 2 seconds
+          setTimeout(() => {
+            window.open(`https://github.com/${repoOwner}/${repoName}/fork`, "_blank");
+          }, 2000);
+        } else {
+          // Other API errors
+          throw new Error("Unexpected response from GitHub API.");
+        }
+      } catch (error) {
+        messageElement.textContent =
+          "An error occurred while checking your fork. Please try again later.";
+        messageElement.classList.add("error");
+        console.error(error);
+      }
+    }
+  </script>
+</body>
+</html>
